@@ -4,6 +4,7 @@
 // issues | ISSUES TABLE
 const express=require("express");
 const app=express()
+const {authmiddleware}=require("./middleware")
 app.use(express.json());
 let users_id=1;
 let organisation_id=1;
@@ -94,7 +95,29 @@ res.json({
     token
 })
 })
-app.post("/oraginisation",(req,res)=>{
+app.post("/oraginisation",authmiddleware,(req,res)=>{
+    const userid=req.user.id
+    organisation.push[{
+        id:organisation_id++,
+        title:req.body.title,
+        description:req.body.description,
+        admin:userid,
+        members:[]
+    }]
+    res.json({
+        message:"org has been created",
+        id:organisation_id1 -1
+    })
+
+
+})
+app.post("/add-member-to-organisation",authmiddleware,(req,res)=>{
+    const userid=req.userid;
+    const organisationid=req.body.organisation_id;
+    const memberuseremail=req.body.organisation_id;
+
+    const organisation= organisation.find(arg=>arg.id===organisation);
+
 
 })
 app.post("/board",(req,res)=>{
