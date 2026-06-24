@@ -26,3 +26,13 @@ module.exports={
 
 
 
+// {
+// "organisation_id":"6a3bc07c4989e8ba3776fcef",
+// "memberuserusername":"6a3b7f1caed50c70068cee3b"
+// }
+
+
+// {
+//   "username":"shaman",
+//   "password":"123456"
+// }

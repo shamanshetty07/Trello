@@ -103,33 +103,71 @@ app.post("/oraginisation",authmiddleware,(req,res)=>{
 
 
 })
-app.post("/add-member-to-organisation",authmiddleware,async(req,res)=>{
-    const userid=req.userid;
-    const organisationid=req.body.organisation_id;
-    const memberuserusername=req.body.memberuserusername;
+// app.post("/add-member-to-organisation",authmiddleware,async(req,res)=>{
+//     const userid=req.userid;
+//     const organisationid=req.body.organisation_id;
+//     const memberuserusername=req.body.memberuserusername;
 
-    const organisation= oraganisationModel.find({
-        _id:organisationid
-    });
+//     const organisation= oraganisationModel.find({
+//         _id:organisationid
+//     });
 
-    if(!organisation ){
-        res.status(411).json({
-    message:"either this org doesnt exist or your not admin of this org"})
-    return;}
+//     if(!organisation ){
+//         res.status(411).json({
+//     message:"either this org doesnt exist or your not admin of this org"})
+//     return;}
  
-    await oraganisationModel.updateOne({
-        _id:organisationid
-    },{$push:{
-        members:memberuserusername
+//     await oraganisationModel.updateOne({
+//         _id:organisationid
+//     },{$push:{
+//         members:memberuserusername
+//     }
+
+//     })
+//     res.json({
+//         message:'new member added!'
+//     })
+
+
+// })
+app.post("/add-member-to-organisation", authmiddleware, async (req, res) => {
+    const userid = req.userid;
+    const organisationid = req.body.organisation_id;
+    const memberuserusername = req.body.c;
+    console.log(organisation_id)
+    const organisation = await oraganisationModel.findOne({
+        _id: organisationid
+    });
+//  || organisation.admin.toString() !== userid
+    if (!organisation) {
+        return res.status(411).json({
+            message: "either this org doesnt exist or you're not admin of this org"
+        });
     }
 
-    })
+    const memberUser = await userModel.findOne({
+        username: memberuserusername
+    });
+
+    if (!memberUser) {
+        return res.status(411).json({
+            message: "user not found"
+        });
+    }
+
+    await oraganisationModel.updateOne(
+        { _id: organisationid },
+        {
+            $push: {
+                members: memberUser._id
+            }
+        }
+    );
+
     res.json({
-        message:'new member added!'
-    })
-
-
-})
+        message: "new member added!"
+    });
+});
 app.post("/board",(req,res)=>{
 
 })

@@ -20,3 +20,8 @@ module.exports={
     oraganisationModel:oraganisationModel
 }
 
+
+// {
+// "organisation_id":"6a3bc07c4989e8ba3776fcef",
+// "memberuserusername":"6a3c114f5b851d1c036000ba"
+// }
