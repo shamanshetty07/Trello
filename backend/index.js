@@ -63,12 +63,12 @@ app.post("/signup",async (req,res)=>{
     })
 
 })
-app.post("/signin",(req,res)=>{
+app.post("/signin",async(req,res)=>{
     const username=req.body.username
     const password=req.body.password
     console.log(username);
     console.log(password)
-    const userExists=userModel.findOne({
+    const userExists=await userModel.findOne({
         username:username,
         password:password
     })
@@ -87,41 +87,43 @@ res.json({
 })
 })
 app.post("/oraginisation",authmiddleware,(req,res)=>{
-    const userid=req.user.id
-    organisation.push({
-        id:organisation_id++,
+    const userid=req.userid
+    oraganisationModel.create({
+        
         title:req.body.title,
         description:req.body.description,
         admin:userid,
         members:[]
     })
-    console.log(organisation)
+   
     res.json({
         message:"org has been created",
-        id:organisation_id -1
+        
     })
 
 
 })
-app.post("/add-member-to-organisation",authmiddleware,(req,res)=>{
+app.post("/add-member-to-organisation",authmiddleware,async(req,res)=>{
     const userid=req.userid;
     const organisationid=req.body.organisation_id;
     const memberuserusername=req.body.memberuserusername;
 
-    const organisation= organisation.find(org=>org.id===organisationid);
+    const organisation= oraganisationModel.find({
+        _id:organisationid
+    });
 
-    if(!organisation || oraganisation.admin!==userid ){
+    if(!organisation ){
         res.status(411).json({
     message:"either this org doesnt exist or your not admin of this org"})
     return;}
-    const memberuser= user.find(u=>u.username === memberuserusername);
-    if(!memberuser){
-        res.status(411).json({
-            message:"No user with this username exists in our db"
-        })
-
+ 
+    await oraganisationModel.updateOne({
+        _id:organisationid
+    },{$push:{
+        members:memberuserusername
     }
-    organisation.members.push(memberuser.id);
+
+    })
     res.json({
         message:'new member added!'
     })
@@ -135,27 +137,23 @@ app.post("/issue",(req,res)=>{
 
 })
 
-app.get('/organization',authmiddleware,(req,res)=>{
+app.get('/organization',authmiddleware,async(req,res)=>{
     const userid=req.userid
-    const organisationid=req.query.oraganisation_id
-    const organisation=organisation.find(org=>org.id===organisationid);
-    if(!organisation || organisation.admin!=userid){
+    const organisationid=req.query.oraganisationid
+    const organisations= await oraganisationModel.find({
+        _id:organisationid,
+        admin:userid
+
+
+ } );
+    if(!organisations ){
         res.status(411).json({
             message:"either this org doesnt exist or your not the admin"
         })
         return
     }
     res.json({
-        organisation:{
-            ...organisation,
-            members:organisation.members.map(memberid=>{
-                const  user=users.find(user=>user.id===memberid);
-                return{
-                    id:user.id,
-                    username:user.username
-                }
-            })
-        }
+        organisations
     })
     
 })
