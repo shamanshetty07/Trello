@@ -2,12 +2,18 @@ const jwt=require("jsonwebtoken")
 
 function authmiddleware(req,res,next){
     const token=req.headers.token
+
     const decoded=jwt.verify(token,"atlationspassword234uu38484858758hfvd");
-    const userid=decoded.userid
-    if(userid){
-        req.userid;   //return it like this because it will availablein the request;
-        next()
-    }else{
+    console.log(decoded)
+    const userid = decoded.userId;
+
+    if (userid) {
+        req.userid = userid;
+        req.user = {
+            id: userid
+        };
+        next();
+    } else {
         res.status(401).json({
             message:"token was incorrect"
         })

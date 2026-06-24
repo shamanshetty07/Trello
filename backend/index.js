@@ -3,6 +3,7 @@
 // boards | Boards TABLE
 // issues | ISSUES TABLE
 const express=require("express");
+const mongoose=require("mongoose")
 const app=express()
 const {authmiddleware}=require("./middleware")
 const jwt = require("jsonwebtoken");
@@ -11,30 +12,9 @@ let users_id=1;
 let organisation_id=1;
 let board_id=1;
 let issue_id=1;
+const {userModel,oraganisationModel}=require("./models")
 
 
-const users=[{
-    id:1,
-    username:"shamn",
-    password:"123456"
-},{
-      id:2,
-    username:"shetty",
-    password:"123456"
-}];
-const organisation=[{
-  id:1,
-  title:"100xdevs",
-  description:"learning coding platform",
-  admin:1,
-  members:[2]
-},{
-    id:2,
-    title:"shetty's personal projects",
-    description:"experimenting",
-    admin:1,
-    members:[]
-}];
 const boards=[{
     id:1,
     title:"100xschool website frontend",
@@ -57,23 +37,27 @@ const issues=[{
 
 
 
-app.post("/signup",(req,res)=>{
+app.post("/signup",async (req,res)=>{
     const username=req.body.username;
     const password=req.body.password;
 
-    const userExists=users.find(u=>u.username=== username);
+    const userExists=await userModel.findOne({
+        username:username,
+        
+    })
     
     if(userExists){
         res.status(411).json({
-            message:"User exists this username already exists"
+            message:"user with this username already exists"
         })
         return;
     }
-    users.push[{
+    userModel.create({
         username:username,
-        password:password,
-        id:users_id++
-    }]
+        password:password
+    })
+
+
     res.json({
         message:"you have signed up succesfully"
     })
@@ -84,8 +68,10 @@ app.post("/signin",(req,res)=>{
     const password=req.body.password
     console.log(username);
     console.log(password)
-    const userExists=users.find(u=>u.username===username && u.password===password);
-    
+    const userExists=userModel.findOne({
+        username:username,
+        password:password
+    })
     if(!userExists){
         res.status(403).json({
             message:"incorrect crendiatls"
@@ -93,7 +79,7 @@ app.post("/signin",(req,res)=>{
         return
     }
    const token= jwt.sign({
-        userId:userExists.id
+        userId:userExists._id
     },"atlationspassword234uu38484858758hfvd")
 
 res.json({
@@ -102,13 +88,14 @@ res.json({
 })
 app.post("/oraginisation",authmiddleware,(req,res)=>{
     const userid=req.user.id
-    organisation.push[{
+    organisation.push({
         id:organisation_id++,
         title:req.body.title,
         description:req.body.description,
         admin:userid,
         members:[]
-    }]
+    })
+    console.log(organisation)
     res.json({
         message:"org has been created",
         id:organisation_id -1
